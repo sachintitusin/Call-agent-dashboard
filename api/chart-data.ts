@@ -13,7 +13,7 @@ const supabase = createClient(
  */
 const ALLOWED_ORIGINS = [
   "http://localhost:5173",
-  "https://your-app.vercel.app", // 👈 change this
+  "https://call-analysis-black.vercel.app",
 ];
 
 export default async function handler(
