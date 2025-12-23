@@ -7,17 +7,25 @@ type Props = {
   onClose: () => void;
 };
 
-const modalRoot = document.getElementById("modal-root")!;
-
 export default function Modal({ children, onClose }: Props) {
-  // Escape key support (important)
+  // 🔑 Resolve inside render, but do NOT early-return before hooks
+  const modalRoot = document.getElementById("modal-root");
+
+  // ✅ Hooks are always called
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
+
+  // ✅ Guard AFTER hooks
+  if (!modalRoot) {
+    console.error("Modal root not found");
+    return null;
+  }
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
