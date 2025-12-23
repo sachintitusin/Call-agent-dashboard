@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import HourlyConversionChart from "../charts/HourlyConversionChart";
 import UploadCallDataModal from "../modals/UploadCallDataModal";
+import ConversationOutcomeDonut from "../charts/ConversationOutcomeDonut";
+import DropOffFunnel from "../charts/DropOffFunnel";
 
 import { fetchChartData } from "../../api/chartData";
 import { adaptChartData } from "../../utils/ChartAdapter";
@@ -145,6 +147,42 @@ export default function DashboardContent() {
             </div>
 
           </section>
+          <section className="mt-16">
+            <h2 className="mb-6 text-lg font-semibold text-text-primary">
+              Sad path analysis
+            </h2>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {/* LEFT: Conversation outcome mix (1/3) */}
+              <div className="lg:col-span-1 rounded-2xl bg-surface/30 px-6 py-5">
+                <ConversationOutcomeDonut
+                  data={[
+                    { label: "Successful", value: 54 },
+                    { label: "Escalated", value: 18 },
+                    { label: "Failed", value: 20 },
+                    { label: "Dropped", value: 8 },
+                  ]}
+                />
+              </div>
+
+              {/* RIGHT: Drop-off funnel (2/3) */}
+              <div className="lg:col-span-2 rounded-2xl bg-surface/30 px-6 py-5">
+                <DropOffFunnel
+                  data={[
+                    { stage: "Call started", remaining: 100 },
+                    { stage: "Verification", remaining: 78 },
+                    { stage: "Intent understood", remaining: 61 },
+                    { stage: "Resolution", remaining: 54 },
+                  ]}
+                />
+              </div>
+            </div>
+          </section>
+
+
+
+
+
         </div>
       </div>
 

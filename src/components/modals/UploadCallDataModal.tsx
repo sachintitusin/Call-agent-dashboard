@@ -91,8 +91,12 @@ export default function UploadCallDataModal({ onClose, onUploadSuccess }: Props)
       // ✅ Notify dashboard which email was updated
       onUploadSuccess(email);
 
-    } catch (err: any) {
-      setError(err.message ?? "Upload failed");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Upload failed");
+      }
     } finally {
       setUploading(false);
     }
