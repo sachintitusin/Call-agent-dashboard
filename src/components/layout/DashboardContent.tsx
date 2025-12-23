@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import HourlyConversionChart from "../charts/HourlyConversionChart";
+import UploadCallDataModal from "../modals/UploadCallDataModal";
+
 import { fetchChartData } from "../../api/chartData";
 import { adaptChartData } from "../../utils/ChartAdapter";
 
@@ -9,34 +11,52 @@ type ChartPoint = {
 };
 
 export default function DashboardContent() {
+  // 🔑 which email’s data is currently shown
+  const [activeEmail, setActiveEmail] = useState<string | null>(null);
+
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        setError(false);
+  /* --------------------------------
+   * Single source of truth for fetch
+   * --------------------------------*/
+  const loadChartData = useCallback(async (email: string) => {
+    try {
+      setLoading(true);
+      setError(false);
 
-        // TODO: replace with real user email later
-        const email = "sally@company.com";
+      const apiData = await fetchChartData(email);
+      const adapted = adaptChartData(apiData);
 
-        const apiData = await fetchChartData(email);
-        console.log(apiData)
-        const adapted = adaptChartData(apiData);
-
-        setChartData(adapted);
-      } catch (err) {
-        console.error("Failed to load chart data", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+      setChartData(adapted);
+    } catch (err) {
+      console.error("Failed to load chart data", err);
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-
-    load();
   }, []);
+
+  /* --------------------------------
+   * Initial load (optional default)
+   * --------------------------------*/
+  useEffect(() => {
+    // Optional: initial email to show on dashboard load
+    const defaultEmail = "sally@company.com";
+    setActiveEmail(defaultEmail);
+    loadChartData(defaultEmail);
+  }, [loadChartData]);
+
+  /* --------------------------------
+   * Called when upload succeeds
+   * --------------------------------*/
+  function handleUploadSuccess(uploadedEmail: string) {
+    setIsUploadOpen(false);
+    setActiveEmail(uploadedEmail);
+    loadChartData(uploadedEmail);
+  }
 
   return (
     <main className="relative flex-1 overflow-y-auto bg-app">
@@ -49,11 +69,12 @@ export default function DashboardContent() {
             {/* LEFT: Insight narrative */}
             <div className="flex max-w-xl flex-col justify-center">
               <p className="mb-3 text-sm text-text-muted">
-                👋 Good morning, Sally
+                👋 Good morning{activeEmail ? "," : ""}{" "}
+                {activeEmail ? activeEmail.split("@")[0] : "there"}
               </p>
 
               <h2 className="mb-4 text-3xl font-semibold leading-tight text-text-primary">
-                Mid-day calls are converting better today
+                Mid-day calls are converting better
               </h2>
 
               <p className="mb-8 text-sm leading-relaxed text-text-secondary">
@@ -83,7 +104,10 @@ export default function DashboardContent() {
                 </div>
               </div>
 
-              <button className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-medium text-white transition hover:opacity-90">
+              <button
+                onClick={() => setIsUploadOpen(true)}
+                className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-medium text-white"
+              >
                 Upload new call data
               </button>
             </div>
@@ -91,6 +115,13 @@ export default function DashboardContent() {
             {/* RIGHT: Chart */}
             <div className="flex items-stretch">
               <div className="relative w-full min-h-[260px] rounded-2xl bg-surface/30 p-4">
+
+                {!activeEmail && (
+                  <p className="text-sm text-text-muted">
+                    Upload call data to see insights
+                  </p>
+                )}
+
                 {loading && (
                   <p className="text-sm text-text-muted">Loading chart…</p>
                 )}
@@ -105,9 +136,9 @@ export default function DashboardContent() {
                   <HourlyConversionChart data={chartData} />
                 )}
 
-                {!loading && !error && chartData.length === 0 && (
+                {!loading && !error && activeEmail && chartData.length === 0 && (
                   <p className="text-sm text-text-muted">
-                    No call data uploaded yet
+                    No call data found for <b>{activeEmail}</b>
                   </p>
                 )}
               </div>
@@ -116,6 +147,14 @@ export default function DashboardContent() {
           </section>
         </div>
       </div>
+
+      {/* Upload modal */}
+      {isUploadOpen && (
+        <UploadCallDataModal
+          onClose={() => setIsUploadOpen(false)}
+          onUploadSuccess={handleUploadSuccess}
+        />
+      )}
     </main>
   );
 }
