@@ -135,6 +135,7 @@ export default function ConversationOutcomeDonut({ data }: Props) {
             <button
             className="
                 rounded-full
+                cursor-pointer
                 border border-border-subtle
                 px-4 py-2
                 text-xs text-text-secondary
@@ -149,6 +150,7 @@ export default function ConversationOutcomeDonut({ data }: Props) {
             <button
             className="
                 rounded-full
+                cursor-pointer
                 border border-border-subtle
                 px-4 py-2
                 text-xs text-text-secondary
@@ -163,6 +165,7 @@ export default function ConversationOutcomeDonut({ data }: Props) {
             <button
             className="
                 rounded-full
+                cursor-pointer
                 border border-border-subtle
                 px-4 py-2
                 text-xs text-text-secondary

@@ -98,7 +98,7 @@ export default function DashboardContent() {
                   ].map((item) => (
                     <button
                       key={item}
-                      className="rounded-lg border border-border-subtle px-3 py-2 text-xs text-text-secondary transition hover:border-brand-primary hover:text-text-primary"
+                      className="rounded-lg cursor-pointer border border-border-subtle px-3 py-2 text-xs text-text-secondary transition hover:border-brand-primary hover:text-text-primary"
                     >
                       {item}
                     </button>
