@@ -1,73 +1,132 @@
-# React + TypeScript + Vite
+# CallInsight Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+CallInsight is a modern analytics dashboard for monitoring call conversations, outcomes, and friction points.  
+The project is designed with a strong emphasis on **UX clarity**, **data storytelling**, and **clean frontend architecture**.
 
-Currently, two official plugins are available:
+This repository demonstrates how conversation data can be transformed into actionable insights through thoughtful visualization and interaction design.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+### 📊 Conversation Analytics
+- **Hourly conversion chart** to identify high‑performing call windows
+- **Conversation outcome mix** (successful, escalated, failed, dropped)
+- **Drop‑off funnel** showing where conversations lose momentum
+- Subtle phase bands to highlight high‑friction stages (e.g. verification)
 
-## Expanding the ESLint configuration
+### 📁 Data Upload Flow
+- Upload call event data via **JSON** (dummy data available inside /data folder)
+- Email‑based dataset ownership
+- Overwrite protection with explicit user confirmation
+- Automatic dashboard refresh after successful upload
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🧠 UX‑Driven Design
+- Collapsible sidebar with smooth hover expansion
+- Clean card‑based layout with consistent spacing
+- Readable, contextual tooltips across charts
+- Action‑oriented insights instead of raw metrics
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠 Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Frontend
+- **React + TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **Recharts** (data visualization)
+
+### Backend / Data
+- **Supabase (PostgreSQL)**
+- Supabase **RPC functions** for aggregated analytics
+- **Vercel Serverless Functions** for secure API access
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+  api/              # API helpers (chart data, uploads, checks)
+  components/
+    charts/         # Recharts-based visualizations
+    layout/         # Sidebar, Topbar
+    modals/         # Upload modal
+  utils/            # Data adapters, validators
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Install dependencies
+```bash
+npm install
 ```
+
+### 2. Environment variables
+
+Create a `.env` file in the project root:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+In production, this should point to your deployed Vercel backend.
+
+### 3. Run locally
+```bash
+npm run dev
+```
+
+---
+
+## 📈 Data Expectations
+
+### Upload format (JSON)
+
+Each upload should contain an array of call events. Example:
+
+```json
+[
+  {
+    "timestamp": "2024-01-12T10:15:00Z",
+    "status": "successful",
+    "stage": "resolution"
+  },
+  {
+    "timestamp": "2024-01-12T10:18:00Z",
+    "status": "failed",
+    "stage": "verification"
+  }
+]
+```
+
+The backend validates and aggregates this data before storing it.
+
+---
+
+## 🔒 Architecture & Design Decisions
+
+- **No global state (Redux / Context)**  
+  Dashboard refreshes are driven via local state and callbacks for clarity and simplicity.
+
+- **Strict TypeScript where it matters**  
+  Business logic and data boundaries are strongly typed.  
+  UI‑library callbacks use pragmatic typing when necessary.
+
+- **Layout owns spacing**  
+  Chart components are content‑only.  
+  Layout components control padding, structure, and visual rhythm.
+
+---
+
+## 🌱 Future Enhancements
+
+- Time‑based comparisons (day‑over‑day, week‑over‑week)
+- Agent‑level performance views
+- Saved insights and alerts
+- Accessibility audit (ARIA roles and keyboard navigation)
+
+---
