@@ -147,9 +147,9 @@ export default function DashboardContent() {
             </div>
 
           </section>
-          <section className="mt-16">
-            <h2 className="mb-6 text-lg font-semibold text-text-primary">
-              Sad path analysis
+          <section className="mt-20">
+            <h2 className="mb-8 text-xl font-semibold text-text-primary">
+              Conversation friction & outcomes
             </h2>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
