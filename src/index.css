@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* =========================
+   THEME TOKENS (Tailwind v4)
+   ========================= */
+@theme {
+  /* Backgrounds */
+  --color-app: #1b1c26;
+  --color-surface: #222336;
+  --color-surface-alt: #26284a;
+
+  /* Borders */
+  --color-border-subtle: #2f3164;
+
+  /* Text */
+  --color-text-primary: #f4f4fb;
+  --color-text-secondary: #b6b8e6;
+  --color-text-muted: #8a8cbf;
+
+  /* Brand */
+  --color-brand-primary: #7e5ef2;
+  --color-brand-teal: #0eb6ad;
+
+  /* Gradient */
+  --gradient-brand: linear-gradient(135deg, #242259, #3c3a8c);
+}
+
+/* Global defaults */
+body {
+  background-color: theme(colors.app);
+  color: theme(colors.text-primary);
+}
+
+
+.app-top-gradient {
+  background: radial-gradient(
+    120% 80% at 50% 0%,
+    rgba(126, 94, 242, 0.18),
+    rgba(36, 34, 89, 0.12),
+    transparent 70%
+  );
+}
