@@ -7,26 +7,20 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
-  { hour: "7 AM", conversion: 34 },
-  { hour: "8 AM", conversion: 38 },
-  { hour: "9 AM", conversion: 42 },
-  { hour: "10 AM", conversion: 48 },
-  { hour: "11 AM", conversion: 61 },
-  { hour: "12 PM", conversion: 68 },
-  { hour: "1 PM", conversion: 72 },
-  { hour: "2 PM", conversion: 66 },
-  { hour: "3 PM", conversion: 54 },
-  { hour: "4 PM", conversion: 49 },
-  { hour: "5 PM", conversion: 44 },
-  { hour: "6 PM", conversion: 39 },
-];
+type ChartPoint = {
+  hour: string;
+  conversion: number;
+};
 
-export default function HourlyConversionChart() {
+type Props = {
+  data: ChartPoint[];
+};
+
+export default function HourlyConversionChart({ data }: Props) {
   return (
     <div className="flex h-full flex-col">
       {/* Chart */}
-      <div className="flex-1">
+      <div className="flex-1 min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
             <XAxis
