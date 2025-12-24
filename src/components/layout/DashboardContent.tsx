@@ -120,7 +120,7 @@ export default function DashboardContent() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIsEditOpen(true)}
-                  className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-brand-primary/90"
+                  className="rounded-lg bg-brand-primary px-6 py-3 text-sm cursor-pointer font-medium text-white shadow-sm transition hover:bg-brand-primary/90"
                 >
                   Add / edit call data
                 </button>
