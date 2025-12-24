@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
+
 import HourlyConversionChart from "../charts/HourlyConversionChart";
 import UploadCallDataModal from "../modals/UploadCallDataModal";
+import EditGraphDataModal from "../modals/EditGraphDataModal";
 import ConversationOutcomeDonut from "../charts/ConversationOutcomeDonut";
 import DropOffFunnel from "../charts/DropOffFunnel";
 
-import { fetchChartData } from "../../api/chartData";
-import { adaptChartData } from "../../utils/ChartAdapter";
+import { getUserGraphData } from "../../api/getUserGraphData";
+import { sortByHourOrder } from "../../utils/sortByHourOrder";
 
 type ChartPoint = {
   hour: string;
@@ -13,28 +15,38 @@ type ChartPoint = {
 };
 
 export default function DashboardContent() {
-  // 🔑 which email’s data is currently shown
+  /* --------------------------------
+   * State
+   * --------------------------------*/
   const [activeEmail, setActiveEmail] = useState<string | null>(null);
 
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   /* --------------------------------
-   * Single source of truth for fetch
+   * Load chart data (single source)
    * --------------------------------*/
-  const loadChartData = useCallback(async (email: string) => {
+  const loadUserChartData = useCallback(async (email: string) => {
     try {
       setLoading(true);
       setError(false);
 
-      const apiData = await fetchChartData(email);
-      const adapted = adaptChartData(apiData);
+      const result = await getUserGraphData(email);
 
-      setChartData(adapted);
+      if (!result.exists) {
+        setChartData([]);
+        return;
+      }
+
+      // ✅ ENSURE DETERMINISTIC HOUR ORDER
+      const sorted = sortByHourOrder(result.data);
+      setChartData(sorted);
     } catch (err) {
-      console.error("Failed to load chart data", err);
+      console.error("Failed to load user chart data", err);
       setError(true);
     } finally {
       setLoading(false);
@@ -42,22 +54,22 @@ export default function DashboardContent() {
   }, []);
 
   /* --------------------------------
-   * Initial load (optional default)
+   * Initial load (demo user)
    * --------------------------------*/
   useEffect(() => {
-    // Optional: initial email to show on dashboard load
     const defaultEmail = "sally@company.com";
     setActiveEmail(defaultEmail);
-    loadChartData(defaultEmail);
-  }, [loadChartData]);
+    loadUserChartData(defaultEmail);
+  }, [loadUserChartData]);
 
   /* --------------------------------
-   * Called when upload succeeds
+   * Called when any data update succeeds
    * --------------------------------*/
-  function handleUploadSuccess(uploadedEmail: string) {
+  function handleDataSuccess(email: string) {
     setIsUploadOpen(false);
-    setActiveEmail(uploadedEmail);
-    loadChartData(uploadedEmail);
+    setIsEditOpen(false);
+    setActiveEmail(email);
+    loadUserChartData(email);
   }
 
   return (
@@ -67,8 +79,7 @@ export default function DashboardContent() {
       <div className="relative px-8 py-16">
         <div className="mx-auto max-w-7xl">
           <section className="grid grid-cols-1 gap-14 lg:grid-cols-2">
-
-            {/* LEFT: Insight narrative */}
+            {/* LEFT: Narrative */}
             <div className="flex max-w-xl flex-col justify-center">
               <p className="mb-3 text-sm text-text-muted">
                 👋 Good morning{activeEmail ? "," : ""}{" "}
@@ -76,13 +87,12 @@ export default function DashboardContent() {
               </p>
 
               <h2 className="mb-4 text-3xl font-semibold leading-tight text-text-primary">
-                Mid-day calls are converting better
+                Conversion performance by hour
               </h2>
 
               <p className="mb-8 text-sm leading-relaxed text-text-secondary">
-                Recent call patterns show higher success rates between 11 AM and
-                2 PM, indicating increased customer readiness during this
-                window.
+                Review how conversion rates vary across different hours of the
+                day for the selected user.
               </p>
 
               <div className="mb-8">
@@ -92,9 +102,9 @@ export default function DashboardContent() {
 
                 <div className="flex flex-wrap gap-2">
                   {[
-                    "Shift more agents to peak mid-day hours",
-                    "Review sentiment trends in failed calls",
-                    "Compare today’s performance with earlier this week",
+                    "Shift more agents to high-performing hours",
+                    "Investigate low-conversion periods",
+                    "Compare performance across users",
                   ].map((item) => (
                     <button
                       key={item}
@@ -106,21 +116,30 @@ export default function DashboardContent() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setIsUploadOpen(true)}
-                className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-medium text-white"
-              >
-                Upload new call data
-              </button>
+              {/* ACTIONS */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsEditOpen(true)}
+                  className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-brand-primary/90"
+                >
+                  Add / edit call data
+                </button>
+
+                <button
+                  onClick={() => setIsUploadOpen(true)}
+                  className="rounded-lg border border-border-subtle px-5 py-3 text-sm font-medium text-text-secondary transition hover:border-brand-primary hover:text-text-primary"
+                >
+                  Upload JSON
+                </button>
+              </div>
             </div>
 
             {/* RIGHT: Chart */}
             <div className="flex items-stretch">
               <div className="relative w-full min-h-[260px] rounded-2xl bg-surface/30 p-4">
-
                 {!activeEmail && (
                   <p className="text-sm text-text-muted">
-                    Upload call data to see insights
+                    Select a user to view insights
                   </p>
                 )}
 
@@ -140,20 +159,20 @@ export default function DashboardContent() {
 
                 {!loading && !error && activeEmail && chartData.length === 0 && (
                   <p className="text-sm text-text-muted">
-                    No call data found for <b>{activeEmail}</b>
+                    No conversion data found for <b>{activeEmail}</b>
                   </p>
                 )}
               </div>
             </div>
-
           </section>
+
+          {/* SECONDARY SECTION */}
           <section className="mt-20">
             <h2 className="mb-8 text-xl font-semibold text-text-primary">
               Conversation friction & outcomes
             </h2>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* LEFT: Conversation outcome mix (1/3) */}
               <div className="lg:col-span-1 rounded-2xl bg-surface/30 px-6 py-5">
                 <ConversationOutcomeDonut
                   data={[
@@ -165,7 +184,6 @@ export default function DashboardContent() {
                 />
               </div>
 
-              {/* RIGHT: Drop-off funnel (2/3) */}
               <div className="lg:col-span-2 rounded-2xl bg-surface/30 px-6 py-5">
                 <DropOffFunnel
                   data={[
@@ -178,19 +196,21 @@ export default function DashboardContent() {
               </div>
             </div>
           </section>
-
-
-
-
-
         </div>
       </div>
 
-      {/* Upload modal */}
+      {/* MODALS */}
       {isUploadOpen && (
         <UploadCallDataModal
           onClose={() => setIsUploadOpen(false)}
-          onUploadSuccess={handleUploadSuccess}
+          onUploadSuccess={handleDataSuccess}
+        />
+      )}
+
+      {isEditOpen && (
+        <EditGraphDataModal
+          onClose={() => setIsEditOpen(false)}
+          onSaveSuccess={handleDataSuccess}
         />
       )}
     </main>
