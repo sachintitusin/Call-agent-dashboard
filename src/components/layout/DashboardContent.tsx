@@ -125,12 +125,12 @@ export default function DashboardContent() {
                   Add / edit call data
                 </button>
 
-                <button
+                {/* <button
                   onClick={() => setIsUploadOpen(true)}
                   className="rounded-lg border border-border-subtle px-5 py-3 text-sm font-medium text-text-secondary transition hover:border-brand-primary hover:text-text-primary"
                 >
                   Upload JSON
-                </button>
+                </button> */}
               </div>
             </div>
 

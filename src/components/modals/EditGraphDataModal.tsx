@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Modal from "./Modal";
 
-import { GRAPH_HOURS, GraphHour } from "../../constants/graphHours";
+import { GRAPH_HOURS } from "../../constants/graphHours";
+import type { GraphHour } from "../../constants/graphHours";
+
 import { getUserGraphData } from "../../api/getUserGraphData";
 import { saveGraphData } from "../../api/saveGraphData";
 

@@ -27,8 +27,8 @@
 
 /* Global defaults */
 body {
-  background-color: theme(colors.app);
-  color: theme(colors.text-primary);
+  background-color: var(--color-app);
+  color: var(--color-text-primary);
 }
 
 
