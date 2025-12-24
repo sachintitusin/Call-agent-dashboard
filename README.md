@@ -91,15 +91,13 @@ Each upload should contain an array of call events. Example:
 ```json
 [
   {
-    "timestamp": "2024-01-12T10:15:00Z",
-    "status": "successful",
-    "stage": "resolution"
+    "timestamp": "2025-01-15T11:11:00Z",
+    "converted": true
   },
   {
-    "timestamp": "2024-01-12T10:18:00Z",
-    "status": "failed",
-    "stage": "verification"
-  }
+    "timestamp": "2025-01-15T12:45:00Z",
+    "converted": false
+  },
 ]
 ```
 
