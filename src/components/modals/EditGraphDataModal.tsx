@@ -20,7 +20,7 @@ type ChartPoint = {
 type Props = {
   initialData: ChartPoint[];
   onClose: () => void;
-  onSaveSuccess: (email: string, data: ChartPoint[]) => void;
+  onSaveSuccess: (data: ChartPoint[]) => void;
 };
 
 export default function EditGraphDataModal({
@@ -144,7 +144,7 @@ export default function EditGraphDataModal({
       await saveGraphData(values.email, values.data);
 
       const updatedChartData = recordToChartPoints(values.data);
-      onSaveSuccess(values.email, updatedChartData);
+      onSaveSuccess(updatedChartData);
     } catch (err) {
       if (err instanceof Error) {
         setSubmitError(err.message);
