@@ -209,8 +209,12 @@ export default function DashboardContent() {
 
       {isEditOpen && (
         <EditGraphDataModal
+          initialData={chartData}
           onClose={() => setIsEditOpen(false)}
-          onSaveSuccess={handleDataSuccess}
+          onSaveSuccess={(email, updatedData) => {
+            setChartData(updatedData);
+            setIsEditOpen(false);
+          }}
         />
       )}
     </main>

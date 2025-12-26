@@ -12,13 +12,19 @@ type FormValues = {
   email: string;
   data: Record<GraphHour, number>;
 };
+type ChartPoint = {
+  hour: string;
+  conversion: number;
+};
 
 type Props = {
+  initialData: ChartPoint[];
   onClose: () => void;
-  onSaveSuccess: (email: string) => void;
+  onSaveSuccess: (email: string, data: ChartPoint[]) => void;
 };
 
 export default function EditGraphDataModal({
+  initialData,
   onClose,
   onSaveSuccess,
 }: Props) {
@@ -27,7 +33,7 @@ export default function EditGraphDataModal({
   const [inputsEnabled, setInputsEnabled] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const {
+    const {
     register,
     handleSubmit,
     watch,
@@ -36,12 +42,35 @@ export default function EditGraphDataModal({
   } = useForm<FormValues>({
     defaultValues: {
       email: "",
-      data: GRAPH_HOURS.reduce((acc, hour) => {
-        acc[hour] = 0;
-        return acc;
-      }, {} as Record<GraphHour, number>),
+      data: chartPointsToRecord(initialData),
     },
   });
+
+  useEffect(() => {
+    reset({
+      email: "",
+      data: chartPointsToRecord(initialData),
+    });
+  }, [initialData, reset]);
+
+  function chartPointsToRecord(
+    points: ChartPoint[]
+  ): Record<GraphHour, number> {
+    return GRAPH_HOURS.reduce((acc, hour) => {
+      const match = points.find((p) => p.hour === hour);
+      acc[hour] = match ? match.conversion : 0;
+      return acc;
+    }, {} as Record<GraphHour, number>);
+  }
+
+  function recordToChartPoints(
+    data: Record<GraphHour, number>
+  ): ChartPoint[] {
+    return GRAPH_HOURS.map((hour) => ({
+      hour,
+      conversion: data[hour],
+    }));
+  }
 
   const email = watch("email");
 
@@ -75,12 +104,16 @@ export default function EditGraphDataModal({
           reset({ email, data: filledData });
           setAlreadyExists(true);
         } else {
+          // reset({
+          //   email,
+          //   data: GRAPH_HOURS.reduce((acc, hour) => {
+          //     acc[hour] = 0;
+          //     return acc;
+          //   }, {} as Record<GraphHour, number>),
+          // });
           reset({
             email,
-            data: GRAPH_HOURS.reduce((acc, hour) => {
-              acc[hour] = 0;
-              return acc;
-            }, {} as Record<GraphHour, number>),
+            data: chartPointsToRecord(initialData),
           });
           setAlreadyExists(false);
         }
@@ -108,7 +141,10 @@ export default function EditGraphDataModal({
       setSubmitError(null);
 
       await saveGraphData(values.email, values.data);
-      onSaveSuccess(values.email);
+      await saveGraphData(values.email, values.data);
+
+      const updatedChartData = recordToChartPoints(values.data);
+      onSaveSuccess(values.email, updatedChartData);
     } catch (err) {
       if (err instanceof Error) {
         setSubmitError(err.message);

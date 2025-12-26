@@ -55,6 +55,8 @@ export default async function handler(
     .eq("email", email)
     .limit(1);
 
+    console.log(users)
+
   if (userError) {
     console.error("Failed to fetch user", userError);
     return res.status(500).json({
